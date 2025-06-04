@@ -182,6 +182,7 @@ module LogViewer
                     width: 100%;
                     border-collapse: collapse;
                     font-size: 18px;
+                    table-layout: fixed;
                 }
                 th {
                     background: #e9ecef;
@@ -207,9 +208,9 @@ module LogViewer
                     white-space: nowrap;
                 }
                 .text {
-                    min-width: 600px;
                     word-wrap: break-word;
                     white-space: pre-wrap;
+                    width: auto;
                 }
                 .file {
                     font-family: 'Monaco', 'Menlo', monospace;
@@ -223,6 +224,9 @@ module LogViewer
                     font-size: 16px;
                     color: #333;
                     font-weight: 500;
+                    max-width: 300px;
+                    word-wrap: break-word;
+                    overflow-wrap: break-word;
                 }
                 .timestamp {
                     font-family: 'Monaco', 'Menlo', monospace;
@@ -257,8 +261,8 @@ module LogViewer
                                 <th style="width: 80px;">Level</th>
                                 <th style="width: 120px;">Tag</th>
                                 <th style="width: 180px;">File</th>
-                                <th style="width: 100px;">Function</th>
-                                <th>Text</th>
+                                <th style="width: 300px;">Function</th>
+                                <th style="width: auto;">Text</th>
                             </tr>
                         </thead>
                         <tbody>
