@@ -252,6 +252,24 @@ module LogViewer
                 <div class="header">
                     <h1>Log Viewer</h1>
                     <p>#{File.basename(@input_file)} • #{logs.length} entries • Level: #{@min_level.upcase}+</p>
+                    <div style="margin-top: 15px;">
+                        <label for="levelFilter" style="color: white; margin-right: 10px;">Filter by level:</label>
+                        <select id="levelFilter" style="padding: 5px; font-size: 14px; border-radius: 4px; border: none;">
+      HTML
+
+    # Generate dropdown options only for levels >= command line minimum
+    min_level_num = LOG_LEVELS[@min_level]
+    LOG_LEVELS.each do |level, level_num|
+      if level_num >= min_level_num
+        html += <<~HTML
+                            <option value="#{level}">#{level.upcase}+</option>
+        HTML
+      end
+    end
+
+    html += <<~HTML
+                        </select>
+                    </div>
                 </div>
                 <div class="table-container">
                     <table>
@@ -279,7 +297,7 @@ module LogViewer
         method_content = log[:method].empty? ? '<span class="empty">-</span>' : log[:method]
         
         html += <<~HTML
-                                <tr>
+                                <tr data-level="#{log[:level].downcase}" data-level-num="#{LOG_LEVELS[log[:level].downcase] || 0}">
                                     <td class="timestamp">#{timestamp_content}</td>
                                     <td class="level" style="#{level_style}">#{log[:level]}</td>
                                     <td class="tag">#{tag_content}</td>
@@ -295,6 +313,51 @@ module LogViewer
                     </table>
                 </div>
             </div>
+          
+            <script>
+                const LOG_LEVELS = {
+                    'trace': 0,
+                    'debug': 1,
+                    'info': 2,
+                    'warning': 3,
+                    'error': 4,
+                    'fatal': 5
+                };
+              
+                const levelFilter = document.getElementById('levelFilter');
+                const tableRows = document.querySelectorAll('tbody tr');
+              
+                // Set initial filter to match command line parameter
+                levelFilter.value = '#{@min_level}';
+              
+                function filterByLevel() {
+                    const selectedLevel = levelFilter.value;
+                    const selectedLevelNum = LOG_LEVELS[selectedLevel];
+                    let visibleCount = 0;
+                  
+                    tableRows.forEach(row => {
+                        const rowLevelNum = parseInt(row.dataset.levelNum);
+                        if (rowLevelNum >= selectedLevelNum) {
+                            row.style.display = '';
+                            visibleCount++;
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                  
+                    // Update the header count
+                    const header = document.querySelector('.header p');
+                    const originalText = header.textContent.split(' • ');
+                    originalText[1] = visibleCount + ' entries';
+                    originalText[2] = 'Level: ' + selectedLevel.toUpperCase() + '+';
+                    header.textContent = originalText.join(' • ');
+                }
+              
+                levelFilter.addEventListener('change', filterByLevel);
+              
+                // Apply initial filter
+                filterByLevel();
+            </script>
         </body>
         </html>
       HTML

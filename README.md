@@ -11,6 +11,7 @@ A Ruby gem that converts NDJSON log files into a readable HTML format for easy v
 - Simplified file paths (shows only filename, not full path)
 - Color-coded log levels for easy identification
 - Large, readable fonts throughout the interface (18px base size)
+- Interactive dynamic filtering by log level in the browser
 - Responsive design that works well in any browser
 - Automatically opens the generated HTML file in your default browser
 
@@ -46,7 +47,7 @@ This will:
 logviewer --level info example.ndjson
 ```
 
-Only shows log entries with level "info" and above (info, warning, error, fatal).
+Only includes log entries with level "info" and above in the HTML file. You can then use the interactive dropdown in the browser to filter further.
 
 ### Auto-Detection of Log Files
 
@@ -104,6 +105,7 @@ Example log entry:
 The generated HTML file will be saved in `/tmp/` with a timestamp and automatically opened in your browser. The HTML includes:
 
 - A wide, responsive table layout (1800px max width) with columns in order: date, level, tag, file, function, text
+- Interactive log level filtering dropdown for dynamic filtering in the browser
 - Human-readable timestamps (MM/DD HH:MM:SS format)
 - Color-coded log levels
 - Sticky header for easy navigation
@@ -113,6 +115,14 @@ The generated HTML file will be saved in `/tmp/` with a timestamp and automatica
 - Optimized column widths with expanded text area for log messages
 - Date, file, and function names in monospace font
 - Color-coded tags for easy categorization
+
+## Interactive Features
+
+Once the HTML file opens in your browser, you can:
+- Use the dropdown in the header to dynamically filter log entries by minimum level
+- Filter changes are applied instantly without page reload
+- Entry counts update automatically to show how many entries match the current filter
+- Command line level acts as the initial data set - browser filtering works within those entries
 
 ## Development
 
