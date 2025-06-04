@@ -106,19 +106,19 @@ module LogViewer
     def level_color(level)
       case level.downcase
       when 'trace'
-        '#6c757d'
+        '#adb5bd'
       when 'debug'
-        '#6c757d'
+        '#adb5bd'
       when 'info'
-        '#0d6efd'
+        '#6ea8fe'
       when 'warning'
-        '#fd7e14'
+        '#fd9843'
       when 'error'
-        '#dc3545'
+        '#ea868f'
       when 'fatal'
-        '#6f42c1'
+        '#c29ffa'
       else
-        '#000000'
+        '#e0e0e0'
       end
     end
 
@@ -151,19 +151,20 @@ module LogViewer
                     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
                     margin: 0;
                     padding: 20px;
-                    background-color: #f8f9fa;
+                    background-color: #1a1a1a;
+                    color: #e0e0e0;
                 }
                 .container {
                     max-width: 1800px;
                     margin: 0 auto;
-                    background: white;
+                    background: #2d2d2d;
                     border-radius: 8px;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
                     overflow: hidden;
                 }
                 .header {
-                    background: #343a40;
-                    color: white;
+                    background: #1e1e1e;
+                    color: #f0f0f0;
                     padding: 20px;
                     text-align: center;
                 }
@@ -185,21 +186,23 @@ module LogViewer
                     table-layout: fixed;
                 }
                 th {
-                    background: #e9ecef;
+                    background: #3a3a3a;
+                    color: #f0f0f0;
                     padding: 18px;
                     text-align: left;
                     font-weight: 600;
-                    border-bottom: 2px solid #dee2e6;
+                    border-bottom: 2px solid #555555;
                     position: sticky;
                     top: 0;
                 }
                 td {
                     padding: 15px 18px;
-                    border-bottom: 1px solid #dee2e6;
+                    border-bottom: 1px solid #404040;
                     vertical-align: top;
+                    color: #e0e0e0;
                 }
                 tr:hover {
-                    background-color: #f8f9fa;
+                    background-color: #3a3a3a;
                 }
                 .level {
                     font-weight: bold;
@@ -215,14 +218,14 @@ module LogViewer
                 .file {
                     font-family: 'Monaco', 'Menlo', monospace;
                     font-size: 16px;
-                    color: #666;
+                    color: #b0b0b0;
                     max-width: 200px;
                     word-wrap: break-word;
                 }
                 .method {
                     font-family: 'Monaco', 'Menlo', monospace;
                     font-size: 16px;
-                    color: #333;
+                    color: #d0d0d0;
                     font-weight: 500;
                     max-width: 300px;
                     word-wrap: break-word;
@@ -231,18 +234,18 @@ module LogViewer
                 .timestamp {
                     font-family: 'Monaco', 'Menlo', monospace;
                     font-size: 15px;
-                    color: #666;
+                    color: #b0b0b0;
                     white-space: nowrap;
                 }
                 .tag {
                     font-family: 'Monaco', 'Menlo', monospace;
                     font-size: 16px;
-                    color: #007acc;
+                    color: #5dade2;
                     font-weight: 500;
                 }
 
                 .empty {
-                    color: #999;
+                    color: #777;
                     font-style: italic;
                 }
             </style>
@@ -254,7 +257,7 @@ module LogViewer
                     <p>#{File.basename(@input_file)} • #{logs.length} entries • Level: #{@min_level.upcase}+</p>
                     <div style="margin-top: 15px;">
                         <label for="levelFilter" style="color: white; margin-right: 10px;">Filter by level:</label>
-                        <select id="levelFilter" style="padding: 5px; font-size: 14px; border-radius: 4px; border: none;">
+                        <select id="levelFilter" style="padding: 5px; font-size: 14px; border-radius: 4px; border: none; background-color: #3a3a3a; color: #f0f0f0;">
       HTML
 
     # Generate dropdown options only for levels >= command line minimum
