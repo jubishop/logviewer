@@ -23,7 +23,7 @@ module LogViewer
 
     def parse_options
       OptionParser.new do |opts|
-        opts.banner = "Usage: logviewer [options] <ndjson_file>"
+        opts.banner = "Usage: logviewer [options] [ndjson_file]"
         
         opts.on('-l', '--level LEVEL', 'Minimum log level (trace, debug, info, warning, error, fatal)') do |level|
           level = level.downcase
@@ -48,17 +48,29 @@ module LogViewer
       end.parse!(@args)
       
       if @args.empty?
-        puts "Error: Please provide an NDJSON file path"
-        puts "Usage: logviewer [options] <ndjson_file>"
-        exit 1
+        @input_file = find_most_recent_ndjson_file
+        if @input_file.nil?
+          puts "Error: No .ndjson files found in current directory"
+          puts "Usage: logviewer [options] [ndjson_file]"
+          exit 1
+        end
+        puts "No file specified, using most recent .ndjson file: #{@input_file}"
+      else
+        @input_file = @args[0]
       end
-      
-      @input_file = @args[0]
       
       unless File.exist?(@input_file)
         puts "Error: File not found: #{@input_file}"
         exit 1
       end
+    end
+
+    def find_most_recent_ndjson_file
+      ndjson_files = Dir.glob('*.ndjson')
+      return nil if ndjson_files.empty?
+      
+      # Sort by modification time (most recent first) and return the first one
+      ndjson_files.max_by { |file| File.mtime(file) }
     end
 
     def should_include_log?(level)

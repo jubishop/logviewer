@@ -27,11 +27,15 @@ gem install logviewer
 ### Basic Usage
 
 ```bash
+# With a specific file
 logviewer example.ndjson
+
+# Without specifying a file (auto-detects most recent .ndjson file)
+logviewer
 ```
 
 This will:
-1. Parse the NDJSON file
+1. Parse the NDJSON file (or auto-detect the most recent .ndjson file in current directory)
 2. Include all log levels (debug and above)
 3. Generate an HTML file in `/tmp/`
 4. Open the HTML file in your default browser
@@ -44,6 +48,16 @@ logviewer --level info example.ndjson
 
 Only shows log entries with level "info" and above (info, warning, error, fatal).
 
+### Auto-Detection of Log Files
+
+When no file is specified, LogViewer automatically searches the current directory for `.ndjson` files and uses the one with the most recent modification date:
+
+```bash
+logviewer --level info
+```
+
+This will find the most recent `.ndjson` file in the current directory and apply the specified log level filter.
+
 ### Command Line Options
 
 - `-l, --level LEVEL`: Set minimum log level (trace, debug, info, warning, error, fatal)
@@ -53,13 +67,16 @@ Only shows log entries with level "info" and above (info, warning, error, fatal)
 ### Examples
 
 ```bash
-# Show all logs
+# Show all logs from a specific file
 logviewer app.ndjson
 
-# Show only warnings and above
-logviewer --level warning app.ndjson
+# Auto-detect most recent .ndjson file and show all logs
+logviewer
 
-# Show only errors and fatal logs
+# Auto-detect most recent .ndjson file and show only warnings and above
+logviewer --level warning
+
+# Show only errors and fatal logs from specific file
 logviewer -l error system.ndjson
 
 # Show version
