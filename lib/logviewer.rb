@@ -1,6 +1,7 @@
 require 'json'
 require 'optparse'
 require 'fileutils'
+require 'time'
 require_relative 'logviewer/version'
 
 module LogViewer
@@ -110,6 +111,17 @@ module LogViewer
       end
     end
 
+    def format_timestamp(timestamp_str)
+      return '' if timestamp_str.nil? || timestamp_str.empty?
+      
+      begin
+        time = Time.parse(timestamp_str)
+        time.strftime('%m/%d %H:%M:%S')
+      rescue => e
+        timestamp_str # fallback to original if parsing fails
+      end
+    end
+
     def generate_html(logs)
       html = <<~HTML
         <!DOCTYPE html>
@@ -179,7 +191,7 @@ module LogViewer
                     white-space: nowrap;
                 }
                 .text {
-                    max-width: 600px;
+                    min-width: 400px;
                     word-wrap: break-word;
                     white-space: pre-wrap;
                 }
@@ -230,13 +242,13 @@ module LogViewer
                     <table>
                         <thead>
                             <tr>
-                                <th style="width: 160px;">Timestamp</th>
+                                <th style="width: 120px;">Timestamp</th>
                                 <th style="width: 80px;">Level</th>
                                 <th style="width: 120px;">Tag</th>
                                 <th>Text</th>
-                                <th style="width: 200px;">File</th>
-                                <th style="width: 60px;">Line</th>
-                                <th style="width: 150px;">Method</th>
+                                <th style="width: 180px;">File</th>
+                                <th style="width: 50px;">Line</th>
+                                <th style="width: 100px;">Method</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -244,7 +256,8 @@ module LogViewer
 
       logs.each do |log|
         level_style = "color: #{level_color(log[:level])}"
-        timestamp_content = log[:timestamp].empty? ? '<span class="empty">-</span>' : log[:timestamp]
+        formatted_timestamp = format_timestamp(log[:timestamp])
+        timestamp_content = formatted_timestamp.empty? ? '<span class="empty">-</span>' : formatted_timestamp
         tag_content = log[:tag].empty? ? '<span class="empty">-</span>' : log[:tag]
         text_content = log[:text].empty? ? '<span class="empty">-</span>' : log[:text]
         file_content = log[:file].empty? ? '<span class="empty">-</span>' : log[:file]
