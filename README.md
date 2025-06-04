@@ -8,7 +8,9 @@ A Ruby gem that converts NDJSON log files into a readable HTML format for easy v
 - Filters logs by minimum level (trace, debug, info, warning, error, fatal)
 - Displays key fields: timestamp, level, tag, text, file, line, and method
 - Human-readable timestamp formatting (MM/DD HH:MM:SS)
+- Simplified file paths (shows only filename, not full path)
 - Color-coded log levels for easy identification
+- Large, readable fonts throughout the interface (18px base size)
 - Responsive design that works well in any browser
 - Automatically opens the generated HTML file in your default browser
 
@@ -72,7 +74,7 @@ The tool expects NDJSON (newline-delimited JSON) files where each line contains 
 - `level`: Log level (trace, debug, info, warning, error, fatal)
 - `tag`: Category or module tag (e.g., "Play/manager")
 - `text`: The log message
-- `file`: Source file name
+- `file`: Source file path (displayed as filename only)
 - `line`: Line number in the source file
 - `method`: Function/method name
 
@@ -85,11 +87,13 @@ Example log entry:
 
 The generated HTML file will be saved in `/tmp/` with a timestamp and automatically opened in your browser. The HTML includes:
 
-- A responsive table layout with timestamp, level, tag, text, file, line, and method columns
+- A wide, responsive table layout (1800px max width) with timestamp, level, tag, text, file, line, and method columns
 - Human-readable timestamps (MM/DD HH:MM:SS format)
 - Color-coded log levels
 - Sticky header for easy navigation
 - Hover effects for better readability
+- Large fonts (18px base size) for excellent readability
+- Simplified file display (filename only, not full paths)
 - Optimized column widths with expanded text area for log messages
 - Timestamp, file, line, and method names in monospace font
 - Color-coded tags for easy categorization

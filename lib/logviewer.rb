@@ -122,6 +122,11 @@ module LogViewer
       end
     end
 
+    def extract_filename(file_path)
+      return '' if file_path.nil? || file_path.empty?
+      File.basename(file_path)
+    end
+
     def generate_html(logs)
       html = <<~HTML
         <!DOCTYPE html>
@@ -138,7 +143,7 @@ module LogViewer
                     background-color: #f8f9fa;
                 }
                 .container {
-                    max-width: 1400px;
+                    max-width: 1800px;
                     margin: 0 auto;
                     background: white;
                     border-radius: 8px;
@@ -165,11 +170,11 @@ module LogViewer
                 table {
                     width: 100%;
                     border-collapse: collapse;
-                    font-size: 14px;
+                    font-size: 18px;
                 }
                 th {
                     background: #e9ecef;
-                    padding: 12px;
+                    padding: 18px;
                     text-align: left;
                     font-weight: 600;
                     border-bottom: 2px solid #dee2e6;
@@ -177,7 +182,7 @@ module LogViewer
                     top: 0;
                 }
                 td {
-                    padding: 10px 12px;
+                    padding: 15px 18px;
                     border-bottom: 1px solid #dee2e6;
                     vertical-align: top;
                 }
@@ -187,42 +192,42 @@ module LogViewer
                 .level {
                     font-weight: bold;
                     text-transform: uppercase;
-                    font-size: 12px;
+                    font-size: 16px;
                     white-space: nowrap;
                 }
                 .text {
-                    min-width: 400px;
+                    min-width: 600px;
                     word-wrap: break-word;
                     white-space: pre-wrap;
                 }
                 .file {
                     font-family: 'Monaco', 'Menlo', monospace;
-                    font-size: 12px;
+                    font-size: 16px;
                     color: #666;
                     max-width: 200px;
                     word-wrap: break-word;
                 }
                 .method {
                     font-family: 'Monaco', 'Menlo', monospace;
-                    font-size: 12px;
+                    font-size: 16px;
                     color: #333;
                     font-weight: 500;
                 }
                 .timestamp {
                     font-family: 'Monaco', 'Menlo', monospace;
-                    font-size: 11px;
+                    font-size: 15px;
                     color: #666;
                     white-space: nowrap;
                 }
                 .tag {
                     font-family: 'Monaco', 'Menlo', monospace;
-                    font-size: 12px;
+                    font-size: 16px;
                     color: #007acc;
                     font-weight: 500;
                 }
                 .line {
                     font-family: 'Monaco', 'Menlo', monospace;
-                    font-size: 12px;
+                    font-size: 16px;
                     color: #999;
                     text-align: right;
                 }
@@ -260,7 +265,8 @@ module LogViewer
         timestamp_content = formatted_timestamp.empty? ? '<span class="empty">-</span>' : formatted_timestamp
         tag_content = log[:tag].empty? ? '<span class="empty">-</span>' : log[:tag]
         text_content = log[:text].empty? ? '<span class="empty">-</span>' : log[:text]
-        file_content = log[:file].empty? ? '<span class="empty">-</span>' : log[:file]
+        filename = extract_filename(log[:file])
+        file_content = filename.empty? ? '<span class="empty">-</span>' : filename
         line_content = log[:line].nil? ? '<span class="empty">-</span>' : log[:line]
         method_content = log[:method].empty? ? '<span class="empty">-</span>' : log[:method]
         
