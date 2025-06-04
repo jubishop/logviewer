@@ -6,7 +6,7 @@ A Ruby gem that converts NDJSON log files into a readable HTML format for easy v
 
 - Converts NDJSON log files to HTML tables
 - Filters logs by minimum level (trace, debug, info, warning, error, fatal)
-- Displays key fields: level, text, file, and method
+- Displays key fields: timestamp, level, tag, text, file, line, and method
 - Color-coded log levels for easy identification
 - Responsive design that works well in any browser
 - Automatically opens the generated HTML file in your default browser
@@ -67,25 +67,29 @@ logviewer --version
 
 The tool expects NDJSON (newline-delimited JSON) files where each line contains a JSON object with these fields:
 
+- `timestamp`: ISO 8601 timestamp (e.g., "2025-06-02T18:22:48.855-07:00")
 - `level`: Log level (trace, debug, info, warning, error, fatal)
+- `tag`: Category or module tag (e.g., "Play/manager")
 - `text`: The log message
 - `file`: Source file name
+- `line`: Line number in the source file
 - `method`: Function/method name
 
 Example log entry:
 ```json
-{"level":"info","text":"User logged in successfully","file":"auth.rb","method":"login"}
+{"timestamp":"2025-06-02T18:22:48.855-07:00","level":"info","tag":"Auth/manager","text":"User logged in successfully","file":"auth.rb","line":42,"method":"login"}
 ```
 
 ## Output
 
 The generated HTML file will be saved in `/tmp/` with a timestamp and automatically opened in your browser. The HTML includes:
 
-- A responsive table layout
+- A responsive table layout with timestamp, level, tag, text, file, line, and method columns
 - Color-coded log levels
 - Sticky header for easy navigation
 - Hover effects for better readability
-- File and method names in monospace font
+- Timestamp, file, line, and method names in monospace font
+- Color-coded tags for easy categorization
 
 ## Development
 

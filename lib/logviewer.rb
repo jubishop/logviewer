@@ -74,9 +74,12 @@ module LogViewer
           
           if should_include_log?(log_entry['level'])
             logs << {
+              timestamp: log_entry['timestamp'] || '',
               level: log_entry['level'] || 'unknown',
+              tag: log_entry['tag'] || '',
               text: log_entry['text'] || '',
               file: log_entry['file'] || '',
+              line: log_entry['line'],
               method: log_entry['method'] || ''
             }
           end
@@ -193,6 +196,24 @@ module LogViewer
                     color: #333;
                     font-weight: 500;
                 }
+                .timestamp {
+                    font-family: 'Monaco', 'Menlo', monospace;
+                    font-size: 11px;
+                    color: #666;
+                    white-space: nowrap;
+                }
+                .tag {
+                    font-family: 'Monaco', 'Menlo', monospace;
+                    font-size: 12px;
+                    color: #007acc;
+                    font-weight: 500;
+                }
+                .line {
+                    font-family: 'Monaco', 'Menlo', monospace;
+                    font-size: 12px;
+                    color: #999;
+                    text-align: right;
+                }
                 .empty {
                     color: #999;
                     font-style: italic;
@@ -209,9 +230,12 @@ module LogViewer
                     <table>
                         <thead>
                             <tr>
+                                <th style="width: 160px;">Timestamp</th>
                                 <th style="width: 80px;">Level</th>
+                                <th style="width: 120px;">Tag</th>
                                 <th>Text</th>
                                 <th style="width: 200px;">File</th>
+                                <th style="width: 60px;">Line</th>
                                 <th style="width: 150px;">Method</th>
                             </tr>
                         </thead>
@@ -220,15 +244,21 @@ module LogViewer
 
       logs.each do |log|
         level_style = "color: #{level_color(log[:level])}"
+        timestamp_content = log[:timestamp].empty? ? '<span class="empty">-</span>' : log[:timestamp]
+        tag_content = log[:tag].empty? ? '<span class="empty">-</span>' : log[:tag]
         text_content = log[:text].empty? ? '<span class="empty">-</span>' : log[:text]
         file_content = log[:file].empty? ? '<span class="empty">-</span>' : log[:file]
+        line_content = log[:line].nil? ? '<span class="empty">-</span>' : log[:line]
         method_content = log[:method].empty? ? '<span class="empty">-</span>' : log[:method]
         
         html += <<~HTML
                                 <tr>
+                                    <td class="timestamp">#{timestamp_content}</td>
                                     <td class="level" style="#{level_style}">#{log[:level]}</td>
+                                    <td class="tag">#{tag_content}</td>
                                     <td class="text">#{text_content}</td>
                                     <td class="file">#{file_content}</td>
+                                    <td class="line">#{line_content}</td>
                                     <td class="method">#{method_content}</td>
                                 </tr>
         HTML
