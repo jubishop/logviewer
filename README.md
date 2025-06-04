@@ -1,6 +1,6 @@
-# Log Viewer
+# LogViewer
 
-A Ruby command-line tool that converts NDJSON log files into a readable HTML format for easy viewing in your browser.
+A Ruby gem that converts NDJSON log files into a readable HTML format for easy viewing in your browser.
 
 ## Features
 
@@ -11,17 +11,20 @@ A Ruby command-line tool that converts NDJSON log files into a readable HTML for
 - Responsive design that works well in any browser
 - Automatically opens the generated HTML file in your default browser
 
-## Requirements
+## Installation
 
-- Ruby (any recent version)
-- macOS (uses `open` command to launch browser)
+Install the gem from RubyGems:
+
+```bash
+gem install logviewer
+```
 
 ## Usage
 
 ### Basic Usage
 
 ```bash
-ruby logviewer.rb example.ndjson
+logviewer example.ndjson
 ```
 
 This will:
@@ -33,7 +36,7 @@ This will:
 ### Filter by Log Level
 
 ```bash
-ruby logviewer.rb --level info example.ndjson
+logviewer --level info example.ndjson
 ```
 
 Only shows log entries with level "info" and above (info, warning, error, fatal).
@@ -41,19 +44,23 @@ Only shows log entries with level "info" and above (info, warning, error, fatal)
 ### Command Line Options
 
 - `-l, --level LEVEL`: Set minimum log level (trace, debug, info, warning, error, fatal)
+- `-v, --version`: Show version
 - `-h, --help`: Show help message
 
 ### Examples
 
 ```bash
 # Show all logs
-ruby logviewer.rb app.ndjson
+logviewer app.ndjson
 
-# Show only warnings and errors
-ruby logviewer.rb --level warning app.ndjson
+# Show only warnings and above
+logviewer --level warning app.ndjson
 
 # Show only errors and fatal logs
-ruby logviewer.rb -l error system.ndjson
+logviewer -l error system.ndjson
+
+# Show version
+logviewer --version
 ```
 
 ## Expected Log Format
@@ -79,3 +86,43 @@ The generated HTML file will be saved in `/tmp/` with a timestamp and automatica
 - Sticky header for easy navigation
 - Hover effects for better readability
 - File and method names in monospace font
+
+## Development
+
+After checking out the repo, run the following commands to set up development:
+
+```bash
+# Install dependencies
+bundle install
+
+# Build the gem
+rake build
+
+# Install locally for testing
+rake install
+
+# Clean build artifacts
+rake clean
+```
+
+### Building and Publishing
+
+```bash
+# Build the gem
+rake build
+
+# Install locally
+rake install
+
+# Push to RubyGems (requires authentication)
+rake push
+```
+
+## Requirements
+
+- Ruby 2.5.0 or higher
+- macOS (uses `open` command to launch browser)
+
+## License
+
+MIT
