@@ -242,6 +242,8 @@ module LogViewer
                     font-size: 16px;
                     color: #5dade2;
                     font-weight: 500;
+                    word-wrap: break-word;
+                    overflow-wrap: break-word;
                 }
 
                 .empty {
