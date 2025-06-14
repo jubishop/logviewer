@@ -10,9 +10,10 @@ module LogViewer
       'trace' => 0,
       'debug' => 1,
       'info' => 2,
-      'warning' => 3,
-      'error' => 4,
-      'fatal' => 5
+      'notice' => 3,
+      'warning' => 4,
+      'error' => 5,
+      'critical' => 6
     }
 
     def initialize(args = ARGV)
@@ -25,7 +26,7 @@ module LogViewer
       OptionParser.new do |opts|
         opts.banner = "Usage: logviewer [options] [ndjson_file]"
         
-        opts.on('-l', '--level LEVEL', 'Minimum log level (trace, debug, info, warning, error, fatal)') do |level|
+        opts.on('-l', '--level LEVEL', 'Minimum log level (trace, debug, info, notice, warning, error, critical)') do |level|
           level = level.downcase
           if LOG_LEVELS.key?(level)
             @min_level = level
@@ -85,14 +86,20 @@ module LogViewer
         begin
           log_entry = JSON.parse(line.strip)
           
-          if should_include_log?(log_entry['level'])
+          if should_include_log?(log_entry['levelName'])
+            # Build tag from subsystem/category
+            tag = []
+            tag << log_entry['subsystem'] if log_entry['subsystem']
+            tag << log_entry['category'] if log_entry['category']
+            tag_string = tag.join('/')
+            
             logs << {
               timestamp: log_entry['timestamp'] || '',
-              level: log_entry['level'] || 'unknown',
-              tag: log_entry['tag'] || '',
-              text: log_entry['text'] || '',
+              level: log_entry['levelName'] || 'unknown',
+              tag: tag_string,
+              text: log_entry['message'] || '',
               file: log_entry['file'] || '',
-              method: log_entry['method'] || ''
+              method: log_entry['function'] || ''
             }
           end
         rescue JSON::ParserError => e
@@ -111,25 +118,28 @@ module LogViewer
         '#adb5bd'
       when 'info'
         '#6ea8fe'
+      when 'notice'
+        '#ffc107'
       when 'warning'
         '#fd9843'
       when 'error'
         '#ea868f'
-      when 'fatal'
+      when 'critical'
         '#c29ffa'
       else
         '#e0e0e0'
       end
     end
 
-    def format_timestamp(timestamp_str)
-      return '' if timestamp_str.nil? || timestamp_str.empty?
+    def format_timestamp(timestamp)
+      return '' if timestamp.nil? || timestamp == ''
       
       begin
-        time = Time.parse(timestamp_str)
+        # Convert milliseconds to seconds for Time.at
+        time = Time.at(timestamp / 1000.0)
         time.strftime('%m/%d %H:%M:%S')
       rescue => e
-        timestamp_str # fallback to original if parsing fails
+        timestamp.to_s # fallback to original if parsing fails
       end
     end
 
@@ -324,9 +334,10 @@ module LogViewer
                     'trace': 0,
                     'debug': 1,
                     'info': 2,
-                    'warning': 3,
-                    'error': 4,
-                    'fatal': 5
+                    'notice': 3,
+                    'warning': 4,
+                    'error': 5,
+                    'critical': 6
                 };
               
                 const levelFilter = document.getElementById('levelFilter');

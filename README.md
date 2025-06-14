@@ -5,7 +5,7 @@ A Ruby gem that converts NDJSON log files into a readable HTML format for easy v
 ## Features
 
 - Converts NDJSON log files to HTML tables
-- Filters logs by minimum level (trace, debug, info, warning, error, fatal)
+- Filters logs by minimum level (trace, debug, info, notice, warning, error, critical)
 - Displays key fields: date, level, tag, file, function, and text
 - Human-readable timestamp formatting (MM/DD HH:MM:SS)
 - Simplified file paths (shows only filename, not full path)
@@ -62,7 +62,7 @@ This will find the most recent `.ndjson` file in the current directory and apply
 
 ### Command Line Options
 
-- `-l, --level LEVEL`: Set minimum log level (trace, debug, info, warning, error, fatal)
+- `-l, --level LEVEL`: Set minimum log level (trace, debug, info, notice, warning, error, critical)
 - `-v, --version`: Show version
 - `-h, --help`: Show help message
 
@@ -89,16 +89,16 @@ logviewer --version
 
 The tool expects NDJSON (newline-delimited JSON) files where each line contains a JSON object with these fields:
 
-- `timestamp`: ISO 8601 timestamp (e.g., "2025-06-02T18:22:48.855-07:00") (displayed as MM/DD HH:MM:SS)
-- `level`: Log level (trace, debug, info, warning, error, fatal)
-- `tag`: Category or module tag (e.g., "Play/manager")
-- `text`: The log message
+- `timestamp`: Unix timestamp in milliseconds since epoch (displayed as MM/DD HH:MM:SS)
+- `levelName`: Log level (trace, debug, info, notice, warning, error, critical)
+- `subsystem` and `category`: Combined to create tag display (e.g., "Play/avPlayer")
+- `message`: The log message
 - `file`: Source file path (displayed as filename only)
-- `method`: Function/method name
+- `function`: Function/method name
 
 Example log entry:
 ```json
-{"timestamp":"2025-06-02T18:22:48.855-07:00","level":"info","tag":"Auth/manager","text":"User logged in successfully","file":"auth.rb","method":"login"}
+{"timestamp":1749926447359,"levelName":"debug","subsystem":"Play","category":"avPlayer","message":"pausing","file":"PodHaven/PodAVPlayer.swift","function":"pause(overwritePreSeekStatus:)","line":136}
 ```
 
 ## Output
