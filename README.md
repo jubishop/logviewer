@@ -37,10 +37,10 @@ logviewer
 ```
 
 This will:
-1. Parse the NDJSON file (or auto-detect the most recent .ndjson file in current directory)
-2. Include all log levels (debug and above)
+1. Parse the NDJSON file
+2. Include all log levels (trace and above by default)
 3. Generate an HTML file in `/tmp/`
-4. Open the HTML file in your default browser
+4. Open the HTML file in your default browser (initially filtered to debug+)
 
 ### Filter by Log Level
 
@@ -48,7 +48,7 @@ This will:
 logviewer --level info example.ndjson
 ```
 
-Only includes log entries with level "info" and above in the HTML file. You can then use the interactive dropdown in the browser to filter further.
+Only includes log entries with level "info" and above in the HTML file. You can then use the interactive dropdown in the browser to filter within those entries.
 
 ### Auto-Detection of Log Files
 
@@ -124,7 +124,9 @@ Once the HTML file opens in your browser, you can:
 - Use the dropdown in the header to dynamically filter log entries by minimum level
 - Filter changes are applied instantly without page reload
 - Entry counts update automatically to show how many entries match the current filter
-- Command line level acts as the initial data set - browser filtering works within those entries
+- Command line level controls what entries are included in the HTML file
+- Browser initially shows debug+ level by default, regardless of command line level
+- Browser filtering works within the entries included from the command line
 
 ## Development
 

@@ -18,7 +18,7 @@ module LogViewer
 
     def initialize(args = ARGV)
       @args = args
-      @min_level = 'debug'
+      @min_level = 'trace'
       @input_file = nil
     end
 
@@ -343,8 +343,8 @@ module LogViewer
                 const levelFilter = document.getElementById('levelFilter');
                 const tableRows = document.querySelectorAll('tbody tr');
               
-                // Set initial filter to match command line parameter
-                levelFilter.value = '#{@min_level}';
+                // Set initial filter to debug (default UI filter)
+                levelFilter.value = 'debug';
               
                 function filterByLevel() {
                     const selectedLevel = levelFilter.value;
