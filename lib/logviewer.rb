@@ -1,7 +1,8 @@
-require 'json'
+ require 'json'
 require 'optparse'
 require 'fileutils'
 require 'time'
+require 'set'
 require_relative 'logviewer/version'
 
 module LogViewer
@@ -25,7 +26,7 @@ module LogViewer
     def parse_options
       OptionParser.new do |opts|
         opts.banner = "Usage: logviewer [options] [ndjson_file]"
-        
+
         opts.on('-l', '--level LEVEL', 'Minimum log level (trace, debug, info, notice, warning, error, critical)') do |level|
           level = level.downcase
           if LOG_LEVELS.key?(level)
@@ -36,18 +37,18 @@ module LogViewer
             exit 1
           end
         end
-        
+
         opts.on('-v', '--version', 'Show version') do
           puts "logviewer #{LogViewer::VERSION}"
           exit
         end
-        
+
         opts.on('-h', '--help', 'Show this help message') do
           puts opts
           exit
         end
       end.parse!(@args)
-      
+
       if @args.empty?
         @input_file = find_most_recent_ndjson_file
         if @input_file.nil?
@@ -59,7 +60,7 @@ module LogViewer
       else
         @input_file = @args[0]
       end
-      
+
       unless File.exist?(@input_file)
         puts "Error: File not found: #{@input_file}"
         exit 1
@@ -69,7 +70,7 @@ module LogViewer
     def find_most_recent_ndjson_file
       ndjson_files = Dir.glob('*.ndjson')
       return nil if ndjson_files.empty?
-      
+
       # Sort by modification time (most recent first) and return the first one
       ndjson_files.max_by { |file| File.mtime(file) }
     end
@@ -81,18 +82,20 @@ module LogViewer
 
     def parse_logs
       logs = []
-      
+      @all_tags = Set.new
+
       File.foreach(@input_file) do |line|
         begin
           log_entry = JSON.parse(line.strip)
-          
+
           if should_include_log?(log_entry['levelName'])
             # Build tag from subsystem/category
             tag = []
             tag << log_entry['subsystem'] if log_entry['subsystem']
             tag << log_entry['category'] if log_entry['category']
             tag_string = tag.join('/')
-            
+            @all_tags.add(tag_string) unless tag_string.empty?
+
             logs << {
               timestamp: log_entry['timestamp'] || '',
               level: log_entry['levelName'] || 'unknown',
@@ -106,7 +109,7 @@ module LogViewer
           puts "Warning: Skipping invalid JSON line: #{e.message}"
         end
       end
-      
+
       logs
     end
 
@@ -133,7 +136,7 @@ module LogViewer
 
     def format_timestamp(timestamp)
       return '' if timestamp.nil? || timestamp == ''
-      
+
       begin
         # Convert milliseconds to seconds for Time.at
         time = Time.at(timestamp / 1000.0)
@@ -284,6 +287,17 @@ module LogViewer
 
     html += <<~HTML
                         </select>
+
+                        <div style="margin-top: 10px;">
+                            <label for="tagFilter" style="color: white; margin-right: 10px;">Filter by tags:</label>
+                            <select id="tagFilter" multiple style="padding: 5px; font-size: 14px; border-radius: 4px; border: none; background-color: #3a3a3a; color: #f0f0f0; min-height: 100px; width: 300px;">
+#{@all_tags.sort.map { |tag| "                                <option value=\"#{tag}\" selected>#{tag}</option>" }.join("\n")}
+                            </select>
+                            <div style="margin-top: 5px; font-size: 12px; color: #ccc;">
+                                <button id="selectAllTags" style="padding: 3px 8px; margin-right: 5px; background: #5a5a5a; color: white; border: none; border-radius: 3px; cursor: pointer;">Select All</button>
+                                <button id="clearAllTags" style="padding: 3px 8px; background: #5a5a5a; color: white; border: none; border-radius: 3px; cursor: pointer;">Clear All</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="table-container">
@@ -310,9 +324,9 @@ module LogViewer
         filename = extract_filename(log[:file])
         file_content = filename.empty? ? '<span class="empty">-</span>' : filename
         method_content = log[:method].empty? ? '<span class="empty">-</span>' : log[:method]
-        
+
         html += <<~HTML
-                                <tr data-level="#{log[:level].downcase}" data-level-num="#{LOG_LEVELS[log[:level].downcase] || 0}">
+                                <tr data-level="#{log[:level].downcase}" data-level-num="#{LOG_LEVELS[log[:level].downcase] || 0}" data-tag="#{log[:tag]}">
                                     <td class="timestamp">#{timestamp_content}</td>
                                     <td class="level" style="#{level_style}">#{log[:level]}</td>
                                     <td class="tag">#{tag_content}</td>
@@ -328,7 +342,7 @@ module LogViewer
                     </table>
                 </div>
             </div>
-          
+
             <script>
                 const LOG_LEVELS = {
                     'trace': 0,
@@ -339,40 +353,80 @@ module LogViewer
                     'error': 5,
                     'critical': 6
                 };
-              
+
                 const levelFilter = document.getElementById('levelFilter');
+                const tagFilter = document.getElementById('tagFilter');
+                const selectAllTagsBtn = document.getElementById('selectAllTags');
+                const clearAllTagsBtn = document.getElementById('clearAllTags');
                 const tableRows = document.querySelectorAll('tbody tr');
-              
+
                 // Set initial filter to debug (default UI filter)
                 levelFilter.value = 'debug';
-              
-                function filterByLevel() {
+
+                function getSelectedTags() {
+                    const selected = [];
+                    for (let option of tagFilter.selectedOptions) {
+                        selected.push(option.value);
+                    }
+                    return selected;
+                }
+
+                function applyFilters() {
                     const selectedLevel = levelFilter.value;
                     const selectedLevelNum = LOG_LEVELS[selectedLevel];
+                    const selectedTags = getSelectedTags();
                     let visibleCount = 0;
-                  
+
                     tableRows.forEach(row => {
                         const rowLevelNum = parseInt(row.dataset.levelNum);
-                        if (rowLevelNum >= selectedLevelNum) {
+                        const rowTag = row.dataset.tag;
+
+                        const levelMatch = rowLevelNum >= selectedLevelNum;
+                        const tagMatch = selectedTags.length === 0 || selectedTags.includes(rowTag) || rowTag === '';
+
+                        if (levelMatch && tagMatch) {
                             row.style.display = '';
                             visibleCount++;
                         } else {
                             row.style.display = 'none';
                         }
                     });
-                  
+
                     // Update the header count
                     const header = document.querySelector('.header p');
                     const originalText = header.textContent.split(' • ');
-                    originalText[1] = visibleCount + ' entries';
-                    originalText[2] = 'Level: ' + selectedLevel.toUpperCase() + '+';
-                    header.textContent = originalText.join(' • ');
+                    const headerParts = [
+                        originalText[0], // filename
+                        visibleCount + ' entries',
+                        'Level: ' + selectedLevel.toUpperCase() + '+'
+                    ];
+
+                    if (selectedTags.length > 0 && selectedTags.length < tagFilter.options.length) {
+                        headerParts.push('Tags: ' + selectedTags.length + ' selected');
+                    }
+
+                    header.textContent = headerParts.join(' • ');
                 }
-              
-                levelFilter.addEventListener('change', filterByLevel);
-              
+
+                selectAllTagsBtn.addEventListener('click', function() {
+                    for (let option of tagFilter.options) {
+                        option.selected = true;
+                    }
+                    applyFilters();
+                });
+
+                clearAllTagsBtn.addEventListener('click', function() {
+                    for (let option of tagFilter.options) {
+                        option.selected = false;
+                    }
+                    applyFilters();
+                });
+
+                levelFilter.addEventListener('change', applyFilters);
+                tagFilter.addEventListener('change', applyFilters);
+
                 // Apply initial filter
-                filterByLevel();
+                applyFilters();
             </script>
         </body>
         </html>
@@ -383,32 +437,32 @@ module LogViewer
 
     def run
       parse_options
-      
+
       puts "Parsing log file: #{@input_file}"
       puts "Minimum log level: #{@min_level}"
-      
+
       logs = parse_logs
       puts "Found #{logs.length} log entries matching criteria"
-      
+
       if logs.empty?
         puts "No log entries found matching the specified criteria."
         exit 0
       end
-      
+
       html_content = generate_html(logs)
-      
+
       # Use /tmp directory for HTML files
       tmp_dir = '/tmp'
-      
+
       # Generate output filename
       base_name = File.basename(@input_file, '.*')
       timestamp = Time.now.strftime('%Y%m%d_%H%M%S')
       output_file = File.join(tmp_dir, "#{base_name}_#{timestamp}.html")
-      
+
       # Write HTML file
       File.write(output_file, html_content)
       puts "HTML file created: #{output_file}"
-      
+
       # Open in browser
       system('open', output_file)
       puts "Opening in browser..."

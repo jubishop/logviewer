@@ -11,7 +11,7 @@ A Ruby gem that converts NDJSON log files into a readable HTML format for easy v
 - Simplified file paths (shows only filename, not full path)
 - Color-coded log levels for easy identification
 - Large, readable fonts throughout the interface (18px base size)
-- Interactive dynamic filtering by log level in the browser
+- Interactive dynamic filtering by log level and tags in the browser
 - Dark mode interface with optimized colors for comfortable viewing
 - Responsive design that works well in any browser
 - Automatically opens the generated HTML file in your default browser
@@ -107,6 +107,7 @@ The generated HTML file will be saved in `/tmp/` with a timestamp and automatica
 
 - A wide, responsive table layout (1800px max width) with columns in order: date, level, tag, file, function, text
 - Interactive log level filtering dropdown for dynamic filtering in the browser
+- Multi-select tag filter to show only specific subsystem/category combinations
 - Dark mode theme with comfortable dark backgrounds and light text
 - Human-readable timestamps (MM/DD HH:MM:SS format)
 - Color-coded log levels optimized for dark backgrounds
@@ -121,12 +122,23 @@ The generated HTML file will be saved in `/tmp/` with a timestamp and automatica
 ## Interactive Features
 
 Once the HTML file opens in your browser, you can:
-- Use the dropdown in the header to dynamically filter log entries by minimum level
+
+### Log Level Filtering
+- Use the level dropdown in the header to dynamically filter log entries by minimum level
 - Filter changes are applied instantly without page reload
-- Entry counts update automatically to show how many entries match the current filter
 - Command line level controls what entries are included in the HTML file
 - Browser initially shows debug+ level by default, regardless of command line level
-- Browser filtering works within the entries included from the command line
+
+### Tag Filtering
+- Use the multi-select tag filter to choose which subsystem/category combinations to display
+- All tags are selected by default (showing all entries)
+- Use "Select All" and "Clear All" buttons for quick selection changes
+- Tags are built from subsystem/category fields (e.g., "Play/avPlayer", "Database/queue")
+
+### Combined Filtering
+- Log level and tag filters work together - entries must match both criteria to be visible
+- Entry counts update automatically to show how many entries match the current filters
+- Header shows selected filter status including number of tags when filtered
 
 ## Development
 
