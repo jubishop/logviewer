@@ -6,7 +6,7 @@ A Ruby gem that converts NDJSON log files into a readable HTML format for easy v
 
 - Converts NDJSON log files to HTML tables
 - Filters logs by minimum level (trace, debug, info, notice, warning, error, critical)
-- Displays key fields: date, level, tag, file, function, and text
+- Displays key fields: date, level, tag, file, line, function, and text
 - Human-readable timestamp formatting (MM/DD HH:MM:SS)
 - Simplified file paths (shows only filename, not full path)
 - Color-coded log levels for easy identification
@@ -105,7 +105,7 @@ Example log entry:
 
 The generated HTML file will be saved in `/tmp/` with a timestamp and automatically opened in your browser. The HTML includes:
 
-- A wide, responsive table layout (1800px max width) with columns in order: date, level, tag, file, function, text
+- A wide, responsive table layout (2000px max width) with columns in order: date, level, tag, file, line, function, text
 - Interactive log level filtering dropdown for dynamic filtering in the browser
 - Multi-select tag filter to show only specific subsystem/category combinations
 - Dark mode theme with comfortable dark backgrounds and light text
@@ -116,7 +116,7 @@ The generated HTML file will be saved in `/tmp/` with a timestamp and automatica
 - Large fonts (18px base size) for excellent readability
 - Simplified file display (filename only, not full paths)
 - Optimized column widths with expanded text area for log messages
-- Date, file, and function names in monospace font
+- Date, file, line, and function names in monospace font
 - Color-coded tags for easy categorization
 
 ## Interactive Features

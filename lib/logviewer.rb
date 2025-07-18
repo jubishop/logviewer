@@ -102,6 +102,7 @@ module LogViewer
               tag: tag_string,
               text: log_entry['message'] || '',
               file: log_entry['file'] || '',
+              line: log_entry['line'],
               method: log_entry['function'] || ''
             }
           end
@@ -168,7 +169,7 @@ module LogViewer
                     color: #e0e0e0;
                 }
                 .container {
-                    max-width: 1800px;
+                    max-width: 2000px;
                     margin: 0 auto;
                     background: #2d2d2d;
                     border-radius: 8px;
@@ -258,6 +259,12 @@ module LogViewer
                     word-wrap: break-word;
                     overflow-wrap: break-word;
                 }
+                .line {
+                    font-family: 'Monaco', 'Menlo', monospace;
+                    font-size: 16px;
+                    color: #999;
+                    text-align: right;
+                }
 
                 .empty {
                     color: #777;
@@ -308,6 +315,7 @@ module LogViewer
                                 <th style="width: 80px;">Level</th>
                                 <th style="width: 120px;">Tag</th>
                                 <th style="width: 180px;">File</th>
+                                <th style="width: 60px;">Line</th>
                                 <th style="width: 300px;">Function</th>
                                 <th style="width: auto;">Text</th>
                             </tr>
@@ -323,6 +331,7 @@ module LogViewer
         text_content = log[:text].empty? ? '<span class="empty">-</span>' : log[:text]
         filename = extract_filename(log[:file])
         file_content = filename.empty? ? '<span class="empty">-</span>' : filename
+        line_content = log[:line].nil? ? '<span class="empty">-</span>' : log[:line]
         method_content = log[:method].empty? ? '<span class="empty">-</span>' : log[:method]
 
         html += <<~HTML
@@ -331,6 +340,7 @@ module LogViewer
                                     <td class="level" style="#{level_style}">#{log[:level]}</td>
                                     <td class="tag">#{tag_content}</td>
                                     <td class="file">#{file_content}</td>
+                                    <td class="line">#{line_content}</td>
                                     <td class="method">#{method_content}</td>
                                     <td class="text">#{text_content}</td>
                                 </tr>
